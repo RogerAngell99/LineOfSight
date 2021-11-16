@@ -8,6 +8,7 @@ import java.awt.Polygon;
 import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
+import net.runelite.api.Player;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -42,7 +43,14 @@ public class TilesOverlay extends Overlay
 
 	private void renderLineOfSightPoints(Graphics2D graphics)
 	{
-		WorldArea area = client.getLocalPlayer().getWorldArea();
+		Player player = client.getLocalPlayer();
+
+		if (player == null)
+		{
+			return;
+		}
+
+		WorldArea area = player.getWorldArea();
 
 		if (area == null)
 		{
