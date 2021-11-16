@@ -36,13 +36,13 @@ public class LineOfSightPlugin extends Plugin
 	}
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		overlayManager.add(lineOfSightTilesOverlay);
 	}
 
 	@Override
-	protected void shutDown() throws Exception
+	protected void shutDown()
 	{
 		overlayManager.remove(lineOfSightTilesOverlay);
 	}
