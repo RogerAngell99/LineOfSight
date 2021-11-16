@@ -63,27 +63,32 @@ public class TilesOverlay extends Overlay
 					continue;
 				}
 
-				WorldPoint point = new WorldPoint(x, y, area.getPlane());
-
-				if (area.hasLineOfSightTo(client, point))
-				{
-					LocalPoint localPoint = LocalPoint.fromWorld(client, point);
-
-					if (localPoint == null)
-					{
-						continue;
-					}
-
-					Polygon polygon = Perspective.getCanvasTilePoly(client, localPoint);
-
-					if (polygon == null)
-					{
-						continue;
-					}
-
-					OverlayUtil.renderPolygon(graphics, polygon, config.borderColor(), new BasicStroke(config.borderWidth()));
-				}
+				renderLineOfSightPoint(graphics, x, y, area);
 			}
+		}
+	}
+
+	private void renderLineOfSightPoint(Graphics2D graphics, int x, int y, WorldArea area)
+	{
+		WorldPoint point = new WorldPoint(x, y, area.getPlane());
+
+		if (area.hasLineOfSightTo(client, point))
+		{
+			LocalPoint localPoint = LocalPoint.fromWorld(client, point);
+
+			if (localPoint == null)
+			{
+				return;
+			}
+
+			Polygon polygon = Perspective.getCanvasTilePoly(client, localPoint);
+
+			if (polygon == null)
+			{
+				return;
+			}
+
+			OverlayUtil.renderPolygon(graphics, polygon, config.borderColor(), new BasicStroke(config.borderWidth()));
 		}
 	}
 }
