@@ -9,5 +9,8 @@ Current version: **2021.11.1**
 ## Overlay
 ![Line of sight overlay](resources/overlay.png)
 
+## Configurations
+![Configurations](resources/configurations.png)
+
 ## License
 [BSD 2-Clause License](LICENSE)
