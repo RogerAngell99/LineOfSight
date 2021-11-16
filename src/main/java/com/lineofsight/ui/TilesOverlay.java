@@ -49,10 +49,10 @@ public class TilesOverlay extends Overlay
 			return;
 		}
 
-		int initialX = area.getX() - config.lineOfSightTilesOverlayRange();
-		int initialY = area.getY() - config.lineOfSightTilesOverlayRange();
-		int maxX = area.getX() + config.lineOfSightTilesOverlayRange();
-		int maxY = area.getY() + config.lineOfSightTilesOverlayRange();
+		int initialX = area.getX() - config.overlayRange();
+		int initialY = area.getY() - config.overlayRange();
+		int maxX = area.getX() + config.overlayRange();
+		int maxY = area.getY() + config.overlayRange();
 
 		for (int x = initialX; x <= maxX; ++x)
 		{
@@ -81,7 +81,7 @@ public class TilesOverlay extends Overlay
 						continue;
 					}
 
-					OverlayUtil.renderPolygon(graphics, polygon, config.lineOfSightTileBorderColor(), new BasicStroke(config.lineOfSightTileBorderWidth()));
+					OverlayUtil.renderPolygon(graphics, polygon, config.borderColor(), new BasicStroke(config.borderWidth()));
 				}
 			}
 		}
