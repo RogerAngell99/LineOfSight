@@ -1,4 +1,4 @@
-package com.lineofsight;
+package com.krazune.lineofsight;
 
 import java.awt.Color;
 import net.runelite.client.config.Alpha;
@@ -12,15 +12,15 @@ public interface LineOfSightPluginConfig extends Config
 {
 	@ConfigItem(
 		position = 0,
-		keyName = "lineOfSightTilesOverlayRange",
-		name = "Tiles overlay range",
-		description = "Range of the line of sight tiles overlay."
+		keyName = "overlayRange",
+		name = "Range",
+		description = "Range of the line of sight overlay."
 	)
 	@Range(
 		min = 1,
 		max = 10
 	)
-	default int lineOfSightTilesOverlayRange()
+	default int overlayRange()
 	{
 		return 10;
 	}
@@ -28,11 +28,11 @@ public interface LineOfSightPluginConfig extends Config
 	@Alpha
 	@ConfigItem(
 		position = 1,
-		keyName = "lineOfSightTileBorderColor",
+		keyName = "borderColor",
 		name = "Border color",
-		description = "Color of the tile border."
+		description = "Color of the overlay's border."
 	)
-	default Color lineOfSightTileBorderColor()
+	default Color borderColor()
 	{
 		return Color.YELLOW;
 	}
@@ -42,11 +42,11 @@ public interface LineOfSightPluginConfig extends Config
 	)
 	@ConfigItem(
 		position = 2,
-		keyName = "lineOfSightTileBorderWidth",
+		keyName = "borderWidth",
 		name = "Border width",
-		description = "Width of the tile border."
+		description = "Width of the overlay's border."
 	)
-	default int lineOfSightTileBorderWidth()
+	default int borderWidth()
 	{
 		return 2;
 	}

@@ -1,6 +1,6 @@
-package com.lineofsight.ui;
+package com.krazune.lineofsight.ui;
 
-import com.lineofsight.LineOfSightPluginConfig;
+import com.krazune.lineofsight.LineOfSightPluginConfig;
 import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -8,6 +8,7 @@ import java.awt.Polygon;
 import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
+import net.runelite.api.Player;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -42,17 +43,24 @@ public class TilesOverlay extends Overlay
 
 	private void renderLineOfSightPoints(Graphics2D graphics)
 	{
-		WorldArea area = client.getLocalPlayer().getWorldArea();
+		Player player = client.getLocalPlayer();
+
+		if (player == null)
+		{
+			return;
+		}
+
+		WorldArea area = player.getWorldArea();
 
 		if (area == null)
 		{
 			return;
 		}
 
-		int initialX = area.getX() - config.lineOfSightTilesOverlayRange();
-		int initialY = area.getY() - config.lineOfSightTilesOverlayRange();
-		int maxX = area.getX() + config.lineOfSightTilesOverlayRange();
-		int maxY = area.getY() + config.lineOfSightTilesOverlayRange();
+		int initialX = area.getX() - config.overlayRange();
+		int initialY = area.getY() - config.overlayRange();
+		int maxX = area.getX() + config.overlayRange();
+		int maxY = area.getY() + config.overlayRange();
 
 		for (int x = initialX; x <= maxX; ++x)
 		{
@@ -63,27 +71,32 @@ public class TilesOverlay extends Overlay
 					continue;
 				}
 
-				WorldPoint point = new WorldPoint(x, y, area.getPlane());
-
-				if (area.hasLineOfSightTo(client, point))
-				{
-					LocalPoint localPoint = LocalPoint.fromWorld(client, point);
-
-					if (localPoint == null)
-					{
-						continue;
-					}
-
-					Polygon polygon = Perspective.getCanvasTilePoly(client, localPoint);
-
-					if (polygon == null)
-					{
-						continue;
-					}
-
-					OverlayUtil.renderPolygon(graphics, polygon, config.lineOfSightTileBorderColor(), new BasicStroke(config.lineOfSightTileBorderWidth()));
-				}
+				renderLineOfSightPoint(graphics, x, y, area);
 			}
+		}
+	}
+
+	private void renderLineOfSightPoint(Graphics2D graphics, int x, int y, WorldArea area)
+	{
+		WorldPoint point = new WorldPoint(x, y, area.getPlane());
+
+		if (area.hasLineOfSightTo(client, point))
+		{
+			LocalPoint localPoint = LocalPoint.fromWorld(client, point);
+
+			if (localPoint == null)
+			{
+				return;
+			}
+
+			Polygon polygon = Perspective.getCanvasTilePoly(client, localPoint);
+
+			if (polygon == null)
+			{
+				return;
+			}
+
+			OverlayUtil.renderPolygon(graphics, polygon, config.borderColor(), new BasicStroke(config.borderWidth()));
 		}
 	}
 }
