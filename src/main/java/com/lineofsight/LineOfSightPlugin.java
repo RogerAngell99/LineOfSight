@@ -21,9 +21,6 @@ import net.runelite.client.ui.overlay.OverlayManager;
 public class LineOfSightPlugin extends Plugin
 {
 	@Inject
-	private LineOfSightPluginConfig config;
-
-	@Inject
 	private OverlayManager overlayManager;
 
 	@Inject
