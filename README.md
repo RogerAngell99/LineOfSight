@@ -1,5 +1,5 @@
 # Line Of Sight
-RuneLite plugin that shows the player's line of sight..
+RuneLite plugin that shows the player's line of sight.
 
 ## Version
 Current version: **2021.11.1**
