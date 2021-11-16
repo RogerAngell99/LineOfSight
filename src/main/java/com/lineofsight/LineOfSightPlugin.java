@@ -10,13 +10,12 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 @PluginDescriptor(
 	name = "Line of Sight",
-	description = "Adds line of sight information.",
+	description = "Shows the player's line of sight.",
 	tags = {
 		"line",
 		"sight",
 		"tiles",
-		"markers",
-		"range"
+		"markers"
 	}
 )
 public class LineOfSightPlugin extends Plugin
