@@ -1,6 +1,6 @@
-package com.lineofsight.ui;
+package com.krazune.lineofsight.ui;
 
-import com.lineofsight.LineOfSightPluginConfig;
+import com.krazune.lineofsight.LineOfSightPluginConfig;
 import java.awt.BasicStroke;
 import java.awt.Dimension;
 import java.awt.Graphics2D;

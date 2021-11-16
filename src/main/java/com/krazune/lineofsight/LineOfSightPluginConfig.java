@@ -1,4 +1,4 @@
-package com.lineofsight;
+package com.krazune.lineofsight;
 
 import java.awt.Color;
 import net.runelite.client.config.Alpha;

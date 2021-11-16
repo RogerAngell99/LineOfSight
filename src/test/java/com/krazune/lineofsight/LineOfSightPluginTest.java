@@ -1,4 +1,4 @@
-package com.lineofsight;
+package com.krazune.lineofsight;
 
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
