@@ -52,26 +52,26 @@ public interface LineOfSightPluginConfig extends Config
 		return 10;
 	}
 
-	@Alpha
 	@ConfigItem(
 		position = 1,
 		keyName = "borderColor",
 		name = "Border color",
 		description = "Color of the overlay's border."
 	)
+	@Alpha
 	default Color borderColor()
 	{
 		return Color.YELLOW;
 	}
 
-	@Range(
-		min = 1
-	)
 	@ConfigItem(
 		position = 2,
 		keyName = "borderWidth",
 		name = "Border width",
 		description = "Width of the overlay's border."
+	)
+	@Range(
+		min = 1
 	)
 	default int borderWidth()
 	{
