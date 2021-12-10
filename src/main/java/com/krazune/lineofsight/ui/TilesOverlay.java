@@ -65,28 +65,30 @@ public class TilesOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		renderPolygons(graphics, generatePolygons());
+		WorldPoint[][] sightPoints = getSightWorldPoints();
+
+		renderOptimizedWorldPoints(graphics, sightPoints);
 
 		return null;
 	}
 
-	private Polygon[][] generatePolygons()
+	public WorldPoint[][] getSightWorldPoints()
 	{
 		int areaLength = config.overlayRange() * 2 + 1;
-		Polygon[][] polygons = new Polygon[areaLength][areaLength];
+		WorldPoint[][] worldPoints = new WorldPoint[areaLength][areaLength];
 
 		Player player = client.getLocalPlayer();
 
 		if (player == null)
 		{
-			return polygons;
+			return worldPoints;
 		}
 
 		WorldArea area = player.getWorldArea();
 
 		if (area == null)
 		{
-			return polygons;
+			return worldPoints;
 		}
 
 		int initialX = area.getX() - config.overlayRange();
@@ -103,49 +105,56 @@ public class TilesOverlay extends Overlay
 					continue;
 				}
 
-				WorldPoint point = new WorldPoint(x, y, area.getPlane());
+				WorldPoint newSightWorldPoint = new WorldPoint(x, y, area.getPlane());
 
-				if (area.hasLineOfSightTo(client, point))
+				if (!area.hasLineOfSightTo(client, newSightWorldPoint))
 				{
-					LocalPoint localPoint = LocalPoint.fromWorld(client, point);
-
-					if (localPoint == null)
-					{
-						continue;
-					}
-
-					polygons[i][j] = Perspective.getCanvasTilePoly(client, localPoint);
+					continue;
 				}
+
+				worldPoints[i][j] = newSightWorldPoint;
 			}
 		}
 
-		return polygons;
+		return worldPoints;
 	}
 
-	private void renderPolygons(Graphics2D graphics, Polygon[][] polygons)
+	private void renderOptimizedWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
 	{
 		int areaLength = config.overlayRange() * 2 + 1;
 		Color transparent = new Color(0, 0, 0, 0);
 		Stroke stroke = new BasicStroke(config.borderWidth());
 
-		for (int i = 0; i < areaLength; ++i)
+		for (int x = 0; x < areaLength; ++x)
 		{
-			for (int j = 0; j < areaLength; ++j)
+			for (int y = 0; y < areaLength; ++y)
 			{
-				if (polygons[i][j] == null)
+				if (sightPoints[x][y] == null)
 				{
 					continue;
 				}
 
-				if (i == 0 || i == areaLength - 1 || j == 0 || j == areaLength - 1 || polygons[i + 1][j] == null || polygons[i - 1][j] == null || polygons[i][j + 1] == null || polygons[i][j - 1] == null)
+				Polygon polygon = generatePolygonFromWorldPoint(sightPoints[x][y]);
+
+				if (polygon == null)
 				{
-					OverlayUtil.renderPolygon(graphics, polygons[i][j], config.borderColor(), transparent, stroke);
+					continue;
+				}
+
+				if (x == 0 || x == areaLength - 1 || y == 0 || y == areaLength - 1 || sightPoints[x + 1][y] == null || sightPoints[x - 1][y] == null || sightPoints[x][y + 1] == null || sightPoints[x][y - 1] == null)
+				{
+					OverlayUtil.renderPolygon(graphics, polygon, config.borderColor(), transparent, stroke);
 
 					continue;
 				}
 
-				polygons[i][j] = null;
+				sightPoints[x][y] = null;
 			}
 		}
+	}
+
+	private Polygon generatePolygonFromWorldPoint(WorldPoint worldPoint)
+	{
+		return Perspective.getCanvasTilePoly(client, LocalPoint.fromWorld(client, worldPoint));
 	}
 }
