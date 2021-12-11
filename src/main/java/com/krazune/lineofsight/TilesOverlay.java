@@ -74,14 +74,7 @@ public class TilesOverlay extends Overlay
 			return null;
 		}
 
-		if (config.showFill())
-		{
-			renderWorldPoints(graphics, sightPoints);
-
-			return null;
-		}
-
-		renderOptimizedWorldPoints(graphics, sightPoints);
+		renderWorldPoints(graphics, sightPoints);
 
 		return null;
 	}
@@ -260,7 +253,7 @@ public class TilesOverlay extends Overlay
 		return worldPoints;
 	}
 
-	private void renderOptimizedWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
+	private void renderWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
 	{
 		int areaLength = config.overlayRange() * 2 + 1;
 		Color transparent = new Color(0, 0, 0, 0);
@@ -282,6 +275,13 @@ public class TilesOverlay extends Overlay
 					continue;
 				}
 
+				if (config.showFill())
+				{
+					OverlayUtil.renderPolygon(graphics, polygon, config.borderColor(), config.fillColor(), stroke);
+
+					continue;
+				}
+
 				if (x == 0 || x == areaLength - 1 || y == 0 || y == areaLength - 1 || sightPoints[x + 1][y] == null || sightPoints[x - 1][y] == null || sightPoints[x][y + 1] == null || sightPoints[x][y - 1] == null)
 				{
 					OverlayUtil.renderPolygon(graphics, polygon, config.borderColor(), transparent, stroke);
@@ -290,32 +290,6 @@ public class TilesOverlay extends Overlay
 				}
 
 				sightPoints[x][y] = null;
-			}
-		}
-	}
-
-	private void renderWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
-	{
-		int areaLength = config.overlayRange() * 2 + 1;
-		Stroke stroke = new BasicStroke(config.borderWidth());
-
-		for (int x = 0; x < areaLength; ++x)
-		{
-			for (int y = 0; y < areaLength; ++y)
-			{
-				if (sightPoints[x][y] == null)
-				{
-					continue;
-				}
-
-				Polygon polygon = generatePolygonFromWorldPoint(sightPoints[x][y]);
-
-				if (polygon == null)
-				{
-					continue;
-				}
-
-				OverlayUtil.renderPolygon(graphics, polygon, config.borderColor(), config.fillColor(), stroke);
 			}
 		}
 	}
