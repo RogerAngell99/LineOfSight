@@ -38,6 +38,7 @@ import javax.inject.Inject;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.Player;
+import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -67,9 +68,108 @@ public class TilesOverlay extends Overlay
 	{
 		WorldPoint[][] sightPoints = getSightWorldPoints();
 
+		if (config.outlineOnly())
+		{
+			renderOutlineWorldPoints(graphics, sightPoints);
+
+			return null;
+		}
+
 		renderOptimizedWorldPoints(graphics, sightPoints);
 
 		return null;
+	}
+
+	private void renderOutlineWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
+	{
+		int areaLength = config.overlayRange() * 2 + 1;
+
+		for (int x = 0; x < areaLength; ++x)
+		{
+			for (int y = 0; y < areaLength; ++y)
+			{
+				if (sightPoints[x][y] == null)
+				{
+					continue;
+				}
+
+				boolean topBorder = y == areaLength - 1 || sightPoints[x][y + 1] == null;
+				boolean rightBorder = x == areaLength - 1 || sightPoints[x + 1][y] == null;
+				boolean bottomBorder = y == 0 || sightPoints[x][y - 1] == null;
+				boolean leftBorder = x == 0 || sightPoints[x - 1][y] == null;
+
+				renderWorldPointBorders(graphics, sightPoints[x][y], topBorder, rightBorder, bottomBorder, leftBorder);
+			}
+		}
+	}
+
+	private void renderWorldPointBorders(Graphics2D graphics, WorldPoint worldPoint, boolean topBorder, boolean rightBorder, boolean bottomBorder, boolean leftBorder)
+	{
+		LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
+		int plane = worldPoint.getPlane();
+
+		graphics.setColor(config.borderColor());
+		graphics.setStroke(new BasicStroke(config.borderWidth()));
+
+		if (topBorder)
+		{
+			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() + 64), plane);
+
+			int x1 = canvasPointA.getX();
+			int y1 = canvasPointA.getY();
+
+			Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() + 64), plane);
+
+			int x2 = canvasPointB.getX();
+			int y2 = canvasPointB.getY();
+
+			graphics.drawLine(x1, y1, x2, y2);
+		}
+
+		if (rightBorder)
+		{
+			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() - 64), plane);
+
+			int x1 = canvasPointA.getX();
+			int y1 = canvasPointA.getY();
+
+			Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() + 64), plane);
+
+			int x2 = canvasPointB.getX();
+			int y2 = canvasPointB.getY();
+
+			graphics.drawLine(x1, y1, x2, y2);
+		}
+
+		if (bottomBorder)
+		{
+			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() - 64), plane);
+
+			int x1 = canvasPointA.getX();
+			int y1 = canvasPointA.getY();
+
+			Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() - 64), plane);
+
+			int x2 = canvasPointB.getX();
+			int y2 = canvasPointB.getY();
+
+			graphics.drawLine(x1, y1, x2, y2);
+		}
+
+		if (leftBorder)
+		{
+			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() - 64), plane);
+
+			int x1 = canvasPointA.getX();
+			int y1 = canvasPointA.getY();
+
+			Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() + 64), plane);
+
+			int x2 = canvasPointB.getX();
+			int y2 = canvasPointB.getY();
+
+			graphics.drawLine(x1, y1, x2, y2);
+		}
 	}
 
 	public WorldPoint[][] getSightWorldPoints()
