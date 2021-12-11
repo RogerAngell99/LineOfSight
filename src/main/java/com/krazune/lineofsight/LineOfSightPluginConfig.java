@@ -53,6 +53,17 @@ public interface LineOfSightPluginConfig extends Config
 	}
 
 	@ConfigItem(
+		position = 0,
+		keyName = "outlineOnly",
+		name = "Outline only",
+		description = "Only show the outer borders."
+	)
+	default boolean outlineOnly()
+	{
+		return false;
+	}
+
+	@ConfigItem(
 		position = 1,
 		keyName = "borderColor",
 		name = "Border color",
