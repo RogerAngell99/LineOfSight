@@ -53,7 +53,7 @@ public interface LineOfSightPluginConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 0,
+		position = 1,
 		keyName = "outlineOnly",
 		name = "Outline only",
 		description = "Only show the outer borders."
@@ -64,7 +64,7 @@ public interface LineOfSightPluginConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 1,
+		position = 2,
 		keyName = "borderColor",
 		name = "Border color",
 		description = "Color of the overlay's border."
@@ -76,7 +76,7 @@ public interface LineOfSightPluginConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 2,
+		position = 3,
 		keyName = "borderWidth",
 		name = "Border width",
 		description = "Width of the overlay's border."
@@ -93,7 +93,7 @@ public interface LineOfSightPluginConfig extends Config
 		position = 4,
 		keyName = "showFill",
 		name = "Tile fill",
-		description = "Add fill color to tiles. WARNING: This is a costly feature, and might lower your game's performance."
+		description = "Add fill color to tiles. WARNING: This is a costly feature that might lower your game's performance."
 	)
 	default boolean showFill()
 	{

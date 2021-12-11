@@ -25,9 +25,8 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.krazune.lineofsight.ui;
+package com.krazune.lineofsight;
 
-import com.krazune.lineofsight.LineOfSightPluginConfig;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -75,119 +74,9 @@ public class TilesOverlay extends Overlay
 			return null;
 		}
 
-		if (config.showFill())
-		{
-			renderWorldPoints(graphics, sightPoints);
-
-			return null;
-		}
-
-		renderOptimizedWorldPoints(graphics, sightPoints);
+		renderWorldPoints(graphics, sightPoints);
 
 		return null;
-	}
-
-	private void renderOutlineWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
-	{
-		int areaLength = config.overlayRange() * 2 + 1;
-
-		for (int x = 0; x < areaLength; ++x)
-		{
-			for (int y = 0; y < areaLength; ++y)
-			{
-				if (sightPoints[x][y] == null)
-				{
-					continue;
-				}
-
-				if (config.showFill())
-				{
-					Polygon tilePolygon = generatePolygonFromWorldPoint(sightPoints[x][y]);
-
-					if (tilePolygon != null)
-					{
-						graphics.setColor(config.fillColor());
-						graphics.fill(tilePolygon);
-					}
-				}
-
-				boolean topBorder = y == areaLength - 1 || sightPoints[x][y + 1] == null;
-				boolean rightBorder = x == areaLength - 1 || sightPoints[x + 1][y] == null;
-				boolean bottomBorder = y == 0 || sightPoints[x][y - 1] == null;
-				boolean leftBorder = x == 0 || sightPoints[x - 1][y] == null;
-
-				renderWorldPointBorders(graphics, sightPoints[x][y], topBorder, rightBorder, bottomBorder, leftBorder);
-			}
-		}
-	}
-
-	private void renderWorldPointBorders(Graphics2D graphics, WorldPoint worldPoint, boolean topBorder, boolean rightBorder, boolean bottomBorder, boolean leftBorder)
-	{
-		LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
-		int plane = worldPoint.getPlane();
-
-		graphics.setColor(config.borderColor());
-		graphics.setStroke(new BasicStroke(config.borderWidth()));
-
-		if (topBorder)
-		{
-			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() + 64), plane);
-
-			int x1 = canvasPointA.getX();
-			int y1 = canvasPointA.getY();
-
-			Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() + 64), plane);
-
-			int x2 = canvasPointB.getX();
-			int y2 = canvasPointB.getY();
-
-			graphics.drawLine(x1, y1, x2, y2);
-		}
-
-		if (rightBorder)
-		{
-			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() - 64), plane);
-
-			int x1 = canvasPointA.getX();
-			int y1 = canvasPointA.getY();
-
-			Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() + 64), plane);
-
-			int x2 = canvasPointB.getX();
-			int y2 = canvasPointB.getY();
-
-			graphics.drawLine(x1, y1, x2, y2);
-		}
-
-		if (bottomBorder)
-		{
-			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() - 64), plane);
-
-			int x1 = canvasPointA.getX();
-			int y1 = canvasPointA.getY();
-
-			Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() - 64), plane);
-
-			int x2 = canvasPointB.getX();
-			int y2 = canvasPointB.getY();
-
-			graphics.drawLine(x1, y1, x2, y2);
-		}
-
-		if (leftBorder)
-		{
-			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() - 64), plane);
-
-			int x1 = canvasPointA.getX();
-			int y1 = canvasPointA.getY();
-
-			Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() + 64), plane);
-
-			int x2 = canvasPointB.getX();
-			int y2 = canvasPointB.getY();
-
-			graphics.drawLine(x1, y1, x2, y2);
-		}
 	}
 
 	public WorldPoint[][] getSightWorldPoints()
@@ -237,7 +126,152 @@ public class TilesOverlay extends Overlay
 		return worldPoints;
 	}
 
-	private void renderOptimizedWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
+	private void renderOutlineWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
+	{
+		int areaLength = config.overlayRange() * 2 + 1;
+
+		for (int x = 0; x < areaLength; ++x)
+		{
+			for (int y = 0; y < areaLength; ++y)
+			{
+				if (sightPoints[x][y] == null)
+				{
+					continue;
+				}
+
+				if (config.showFill())
+				{
+					Polygon tilePolygon = generatePolygonFromWorldPoint(sightPoints[x][y]);
+
+					if (tilePolygon != null)
+					{
+						graphics.setColor(config.fillColor());
+						graphics.fill(tilePolygon);
+					}
+				}
+
+				boolean topBorder = y == areaLength - 1 || sightPoints[x][y + 1] == null;
+				boolean rightBorder = x == areaLength - 1 || sightPoints[x + 1][y] == null;
+				boolean bottomBorder = y == 0 || sightPoints[x][y - 1] == null;
+				boolean leftBorder = x == 0 || sightPoints[x - 1][y] == null;
+
+				renderWorldPointBorders(graphics, sightPoints[x][y], topBorder, rightBorder, bottomBorder, leftBorder);
+			}
+		}
+	}
+
+	private Polygon generatePolygonFromWorldPoint(WorldPoint worldPoint)
+	{
+		LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
+
+		if (localPoint == null)
+		{
+			return null;
+		}
+
+		return Perspective.getCanvasTilePoly(client, localPoint);
+	}
+
+	private void renderWorldPointBorders(Graphics2D graphics, WorldPoint worldPoint, boolean topBorder, boolean rightBorder, boolean bottomBorder, boolean leftBorder)
+	{
+		LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
+
+		if (localPoint == null)
+		{
+			return;
+		}
+
+		int plane = worldPoint.getPlane();
+
+		graphics.setColor(config.borderColor());
+		graphics.setStroke(new BasicStroke(config.borderWidth()));
+
+		if (topBorder)
+		{
+			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() + 64), plane);
+
+			if (canvasPointA != null)
+			{
+				int x1 = canvasPointA.getX();
+				int y1 = canvasPointA.getY();
+
+				Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() + 64), plane);
+
+				if (canvasPointB != null)
+				{
+					int x2 = canvasPointB.getX();
+					int y2 = canvasPointB.getY();
+
+					graphics.drawLine(x1, y1, x2, y2);
+				}
+			}
+		}
+
+		if (rightBorder)
+		{
+			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() - 64), plane);
+
+			if (canvasPointA != null)
+			{
+				int x1 = canvasPointA.getX();
+				int y1 = canvasPointA.getY();
+
+				Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() + 64), plane);
+
+				if (canvasPointB != null)
+				{
+					int x2 = canvasPointB.getX();
+					int y2 = canvasPointB.getY();
+
+					graphics.drawLine(x1, y1, x2, y2);
+				}
+			}
+		}
+
+		if (bottomBorder)
+		{
+			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() - 64), plane);
+
+			if (canvasPointA != null)
+			{
+				int x1 = canvasPointA.getX();
+				int y1 = canvasPointA.getY();
+
+				Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() - 64), plane);
+
+				if (canvasPointB != null)
+				{
+					int x2 = canvasPointB.getX();
+					int y2 = canvasPointB.getY();
+
+					graphics.drawLine(x1, y1, x2, y2);
+				}
+			}
+		}
+
+		if (leftBorder)
+		{
+			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() - 64), plane);
+
+			if (canvasPointA != null)
+			{
+				int x1 = canvasPointA.getX();
+				int y1 = canvasPointA.getY();
+
+				Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() + 64), plane);
+
+				if (canvasPointB != null)
+				{
+					int x2 = canvasPointB.getX();
+					int y2 = canvasPointB.getY();
+
+					graphics.drawLine(x1, y1, x2, y2);
+				}
+			}
+		}
+	}
+
+	private void renderWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
 	{
 		int areaLength = config.overlayRange() * 2 + 1;
 		Color transparent = new Color(0, 0, 0, 0);
@@ -259,6 +293,13 @@ public class TilesOverlay extends Overlay
 					continue;
 				}
 
+				if (config.showFill())
+				{
+					OverlayUtil.renderPolygon(graphics, polygon, config.borderColor(), config.fillColor(), stroke);
+
+					continue;
+				}
+
 				if (x == 0 || x == areaLength - 1 || y == 0 || y == areaLength - 1 || sightPoints[x + 1][y] == null || sightPoints[x - 1][y] == null || sightPoints[x][y + 1] == null || sightPoints[x][y - 1] == null)
 				{
 					OverlayUtil.renderPolygon(graphics, polygon, config.borderColor(), transparent, stroke);
@@ -269,36 +310,5 @@ public class TilesOverlay extends Overlay
 				sightPoints[x][y] = null;
 			}
 		}
-	}
-
-	private void renderWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
-	{
-		int areaLength = config.overlayRange() * 2 + 1;
-		Stroke stroke = new BasicStroke(config.borderWidth());
-
-		for (int x = 0; x < areaLength; ++x)
-		{
-			for (int y = 0; y < areaLength; ++y)
-			{
-				if (sightPoints[x][y] == null)
-				{
-					continue;
-				}
-
-				Polygon polygon = generatePolygonFromWorldPoint(sightPoints[x][y]);
-
-				if (polygon == null)
-				{
-					continue;
-				}
-
-				OverlayUtil.renderPolygon(graphics, polygon, config.borderColor(), config.fillColor(), stroke);
-			}
-		}
-	}
-
-	private Polygon generatePolygonFromWorldPoint(WorldPoint worldPoint)
-	{
-		return Perspective.getCanvasTilePoly(client, LocalPoint.fromWorld(client, worldPoint));
 	}
 }
