@@ -162,12 +162,25 @@ public class TilesOverlay extends Overlay
 
 	private Polygon generatePolygonFromWorldPoint(WorldPoint worldPoint)
 	{
-		return Perspective.getCanvasTilePoly(client, LocalPoint.fromWorld(client, worldPoint));
+		LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
+
+		if (localPoint == null)
+		{
+			return null;
+		}
+
+		return Perspective.getCanvasTilePoly(client, localPoint);
 	}
 
 	private void renderWorldPointBorders(Graphics2D graphics, WorldPoint worldPoint, boolean topBorder, boolean rightBorder, boolean bottomBorder, boolean leftBorder)
 	{
 		LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
+
+		if (localPoint == null)
+		{
+			return;
+		}
+
 		int plane = worldPoint.getPlane();
 
 		graphics.setColor(config.borderColor());
