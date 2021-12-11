@@ -41,7 +41,8 @@ import net.runelite.client.ui.overlay.OverlayManager;
 		"line",
 		"sight",
 		"tiles",
-		"markers"
+		"markers",
+		"range"
 	}
 )
 public class LineOfSightPlugin extends Plugin
