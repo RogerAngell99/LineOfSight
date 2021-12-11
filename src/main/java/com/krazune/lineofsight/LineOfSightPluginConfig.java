@@ -93,7 +93,7 @@ public interface LineOfSightPluginConfig extends Config
 		position = 4,
 		keyName = "showFill",
 		name = "Tile fill",
-		description = "Add fill color to tiles. WARNING: This is a costly feature, and might lower your game's performance."
+		description = "Add fill color to tiles. WARNING: This is a costly feature that might lower your game's performance."
 	)
 	default boolean showFill()
 	{
