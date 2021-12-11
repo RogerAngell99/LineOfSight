@@ -79,6 +79,53 @@ public class TilesOverlay extends Overlay
 		return null;
 	}
 
+	public WorldPoint[][] getSightWorldPoints()
+	{
+		int areaLength = config.overlayRange() * 2 + 1;
+		WorldPoint[][] worldPoints = new WorldPoint[areaLength][areaLength];
+
+		Player player = client.getLocalPlayer();
+
+		if (player == null)
+		{
+			return worldPoints;
+		}
+
+		WorldArea area = player.getWorldArea();
+
+		if (area == null)
+		{
+			return worldPoints;
+		}
+
+		int initialX = area.getX() - config.overlayRange();
+		int initialY = area.getY() - config.overlayRange();
+		int maxX = area.getX() + config.overlayRange();
+		int maxY = area.getY() + config.overlayRange();
+
+		for (int x = initialX, i = 0; x <= maxX; ++x, ++i)
+		{
+			for (int y = initialY, j = 0; y <= maxY; ++y, ++j)
+			{
+				if (x == area.getX() && y == area.getY())
+				{
+					continue;
+				}
+
+				WorldPoint newSightWorldPoint = new WorldPoint(x, y, area.getPlane());
+
+				if (!area.hasLineOfSightTo(client, newSightWorldPoint))
+				{
+					continue;
+				}
+
+				worldPoints[i][j] = newSightWorldPoint;
+			}
+		}
+
+		return worldPoints;
+	}
+
 	private void renderOutlineWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
 	{
 		int areaLength = config.overlayRange() * 2 + 1;
@@ -111,6 +158,11 @@ public class TilesOverlay extends Overlay
 				renderWorldPointBorders(graphics, sightPoints[x][y], topBorder, rightBorder, bottomBorder, leftBorder);
 			}
 		}
+	}
+
+	private Polygon generatePolygonFromWorldPoint(WorldPoint worldPoint)
+	{
+		return Perspective.getCanvasTilePoly(client, LocalPoint.fromWorld(client, worldPoint));
 	}
 
 	private void renderWorldPointBorders(Graphics2D graphics, WorldPoint worldPoint, boolean topBorder, boolean rightBorder, boolean bottomBorder, boolean leftBorder)
@@ -206,53 +258,6 @@ public class TilesOverlay extends Overlay
 		}
 	}
 
-	public WorldPoint[][] getSightWorldPoints()
-	{
-		int areaLength = config.overlayRange() * 2 + 1;
-		WorldPoint[][] worldPoints = new WorldPoint[areaLength][areaLength];
-
-		Player player = client.getLocalPlayer();
-
-		if (player == null)
-		{
-			return worldPoints;
-		}
-
-		WorldArea area = player.getWorldArea();
-
-		if (area == null)
-		{
-			return worldPoints;
-		}
-
-		int initialX = area.getX() - config.overlayRange();
-		int initialY = area.getY() - config.overlayRange();
-		int maxX = area.getX() + config.overlayRange();
-		int maxY = area.getY() + config.overlayRange();
-
-		for (int x = initialX, i = 0; x <= maxX; ++x, ++i)
-		{
-			for (int y = initialY, j = 0; y <= maxY; ++y, ++j)
-			{
-				if (x == area.getX() && y == area.getY())
-				{
-					continue;
-				}
-
-				WorldPoint newSightWorldPoint = new WorldPoint(x, y, area.getPlane());
-
-				if (!area.hasLineOfSightTo(client, newSightWorldPoint))
-				{
-					continue;
-				}
-
-				worldPoints[i][j] = newSightWorldPoint;
-			}
-		}
-
-		return worldPoints;
-	}
-
 	private void renderWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
 	{
 		int areaLength = config.overlayRange() * 2 + 1;
@@ -292,10 +297,5 @@ public class TilesOverlay extends Overlay
 				sightPoints[x][y] = null;
 			}
 		}
-	}
-
-	private Polygon generatePolygonFromWorldPoint(WorldPoint worldPoint)
-	{
-		return Perspective.getCanvasTilePoly(client, LocalPoint.fromWorld(client, worldPoint));
 	}
 }
