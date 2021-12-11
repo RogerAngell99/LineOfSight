@@ -211,52 +211,6 @@ public class TilesOverlay extends Overlay
 				}
 			}
 		}
-/*
-		if (rightBorder)
-		{
-			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() - 64), plane);
-
-			int x1 = canvasPointA.getX();
-			int y1 = canvasPointA.getY();
-
-			Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() + 64), plane);
-
-			int x2 = canvasPointB.getX();
-			int y2 = canvasPointB.getY();
-
-			graphics.drawLine(x1, y1, x2, y2);
-		}
-
-		if (bottomBorder)
-		{
-			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() - 64), plane);
-
-			int x1 = canvasPointA.getX();
-			int y1 = canvasPointA.getY();
-
-			Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() - 64), plane);
-
-			int x2 = canvasPointB.getX();
-			int y2 = canvasPointB.getY();
-
-			graphics.drawLine(x1, y1, x2, y2);
-		}
-
-		if (leftBorder)
-		{
-			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() - 64), plane);
-
-			int x1 = canvasPointA.getX();
-			int y1 = canvasPointA.getY();
-
-			Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() + 64), plane);
-
-			int x2 = canvasPointB.getX();
-			int y2 = canvasPointB.getY();
-
-			graphics.drawLine(x1, y1, x2, y2);
-		}
- */
 	}
 
 	public WorldPoint[][] getSightWorldPoints()
