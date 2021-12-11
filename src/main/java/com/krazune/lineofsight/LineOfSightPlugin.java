@@ -28,7 +28,6 @@
 package com.krazune.lineofsight;
 
 import com.google.inject.Provides;
-import com.krazune.lineofsight.ui.TilesOverlay;
 import javax.inject.Inject;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.plugins.Plugin;
