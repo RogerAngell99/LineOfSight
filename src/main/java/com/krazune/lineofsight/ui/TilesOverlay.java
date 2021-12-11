@@ -75,6 +75,13 @@ public class TilesOverlay extends Overlay
 			return null;
 		}
 
+		if (config.showFill())
+		{
+			renderWorldPoints(graphics, sightPoints);
+
+			return null;
+		}
+
 		renderOptimizedWorldPoints(graphics, sightPoints);
 
 		return null;
@@ -91,6 +98,17 @@ public class TilesOverlay extends Overlay
 				if (sightPoints[x][y] == null)
 				{
 					continue;
+				}
+
+				if (config.showFill())
+				{
+					Polygon tilePolygon = generatePolygonFromWorldPoint(sightPoints[x][y]);
+
+					if (tilePolygon != null)
+					{
+						graphics.setColor(config.fillColor());
+						graphics.fill(tilePolygon);
+					}
 				}
 
 				boolean topBorder = y == areaLength - 1 || sightPoints[x][y + 1] == null;
@@ -249,6 +267,32 @@ public class TilesOverlay extends Overlay
 				}
 
 				sightPoints[x][y] = null;
+			}
+		}
+	}
+
+	private void renderWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints)
+	{
+		int areaLength = config.overlayRange() * 2 + 1;
+		Stroke stroke = new BasicStroke(config.borderWidth());
+
+		for (int x = 0; x < areaLength; ++x)
+		{
+			for (int y = 0; y < areaLength; ++y)
+			{
+				if (sightPoints[x][y] == null)
+				{
+					continue;
+				}
+
+				Polygon polygon = generatePolygonFromWorldPoint(sightPoints[x][y]);
+
+				if (polygon == null)
+				{
+					continue;
+				}
+
+				OverlayUtil.renderPolygon(graphics, polygon, config.borderColor(), config.fillColor(), stroke);
 			}
 		}
 	}

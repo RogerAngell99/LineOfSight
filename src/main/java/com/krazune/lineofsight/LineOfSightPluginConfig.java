@@ -88,4 +88,27 @@ public interface LineOfSightPluginConfig extends Config
 	{
 		return 2;
 	}
+
+	@ConfigItem(
+		position = 4,
+		keyName = "showFill",
+		name = "Tile fill",
+		description = "Add fill color to tiles. WARNING: This is a costly feature, and might lower your game's performance."
+	)
+	default boolean showFill()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 5,
+		keyName = "fillColor",
+		name = "Fill color",
+		description = "Color of the overlay's tiles."
+	)
+	@Alpha
+	default Color fillColor()
+	{
+		return new Color(0, 0, 0, 64);
+	}
 }
