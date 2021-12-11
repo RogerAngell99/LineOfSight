@@ -52,29 +52,63 @@ public interface LineOfSightPluginConfig extends Config
 		return 10;
 	}
 
-	@Alpha
 	@ConfigItem(
 		position = 1,
+		keyName = "outlineOnly",
+		name = "Outline only",
+		description = "Only show the outer borders."
+	)
+	default boolean outlineOnly()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 2,
 		keyName = "borderColor",
 		name = "Border color",
 		description = "Color of the overlay's border."
 	)
+	@Alpha
 	default Color borderColor()
 	{
 		return Color.YELLOW;
 	}
 
-	@Range(
-		min = 1
-	)
 	@ConfigItem(
-		position = 2,
+		position = 3,
 		keyName = "borderWidth",
 		name = "Border width",
 		description = "Width of the overlay's border."
 	)
+	@Range(
+		min = 1
+	)
 	default int borderWidth()
 	{
 		return 2;
+	}
+
+	@ConfigItem(
+		position = 4,
+		keyName = "showFill",
+		name = "Tile fill",
+		description = "Add fill color to tiles. WARNING: This is a costly feature that might lower your game's performance."
+	)
+	default boolean showFill()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 5,
+		keyName = "fillColor",
+		name = "Fill color",
+		description = "Color of the overlay's tiles."
+	)
+	@Alpha
+	default Color fillColor()
+	{
+		return new Color(0, 0, 0, 64);
 	}
 }

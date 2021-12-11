@@ -10,7 +10,7 @@ repositories {
 	mavenCentral()
 }
 
-def runeLiteVersion = '1.8.2'
+def runeLiteVersion = '1.8.6'
 
 dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
@@ -24,7 +24,7 @@ dependencies {
 }
 
 group = 'com.krazune'
-version = '2021.11.1'
+version = '2021.12.1'
 sourceCompatibility = '1.8'
 
 tasks.withType(JavaCompile) {
