@@ -38,6 +38,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.Player;
 import net.runelite.api.Point;
+import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -102,6 +103,7 @@ public class TilesOverlay extends Overlay
 		int initialY = area.getY() - config.overlayRange();
 		int maxX = area.getX() + config.overlayRange();
 		int maxY = area.getY() + config.overlayRange();
+		WorldView worldView = client.getTopLevelWorldView();
 
 		for (int x = initialX, i = 0; x <= maxX; ++x, ++i)
 		{
@@ -114,7 +116,7 @@ public class TilesOverlay extends Overlay
 
 				WorldPoint newSightWorldPoint = new WorldPoint(x, y, area.getPlane());
 
-				if (!area.hasLineOfSightTo(client, newSightWorldPoint))
+				if (!area.hasLineOfSightTo(worldView, newSightWorldPoint))
 				{
 					continue;
 				}
@@ -162,7 +164,7 @@ public class TilesOverlay extends Overlay
 
 	private Polygon generatePolygonFromWorldPoint(WorldPoint worldPoint)
 	{
-		LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
+		LocalPoint localPoint = LocalPoint.fromWorld(client.getTopLevelWorldView(), worldPoint);
 
 		if (localPoint == null)
 		{
@@ -174,7 +176,8 @@ public class TilesOverlay extends Overlay
 
 	private void renderWorldPointBorders(Graphics2D graphics, WorldPoint worldPoint, boolean topBorder, boolean rightBorder, boolean bottomBorder, boolean leftBorder)
 	{
-		LocalPoint localPoint = LocalPoint.fromWorld(client, worldPoint);
+		WorldView worldView = client.getTopLevelWorldView();
+		LocalPoint localPoint = LocalPoint.fromWorld(worldView, worldPoint);
 
 		if (localPoint == null)
 		{
@@ -188,14 +191,14 @@ public class TilesOverlay extends Overlay
 
 		if (topBorder)
 		{
-			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() + 64), plane);
+			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() + 64, worldView), plane);
 
 			if (canvasPointA != null)
 			{
 				int x1 = canvasPointA.getX();
 				int y1 = canvasPointA.getY();
 
-				Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() + 64), plane);
+				Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() + 64, worldView), plane);
 
 				if (canvasPointB != null)
 				{
@@ -209,14 +212,14 @@ public class TilesOverlay extends Overlay
 
 		if (rightBorder)
 		{
-			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() - 64), plane);
+			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() - 64, worldView), plane);
 
 			if (canvasPointA != null)
 			{
 				int x1 = canvasPointA.getX();
 				int y1 = canvasPointA.getY();
 
-				Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() + 64), plane);
+				Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() + 64, worldView), plane);
 
 				if (canvasPointB != null)
 				{
@@ -230,14 +233,14 @@ public class TilesOverlay extends Overlay
 
 		if (bottomBorder)
 		{
-			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() - 64), plane);
+			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() - 64, worldView), plane);
 
 			if (canvasPointA != null)
 			{
 				int x1 = canvasPointA.getX();
 				int y1 = canvasPointA.getY();
 
-				Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() - 64), plane);
+				Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() + 64, localPoint.getY() - 64, worldView), plane);
 
 				if (canvasPointB != null)
 				{
@@ -251,14 +254,14 @@ public class TilesOverlay extends Overlay
 
 		if (leftBorder)
 		{
-			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() - 64), plane);
+			Point canvasPointA = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() - 64, worldView), plane);
 
 			if (canvasPointA != null)
 			{
 				int x1 = canvasPointA.getX();
 				int y1 = canvasPointA.getY();
 
-				Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() + 64), plane);
+				Point canvasPointB = Perspective.localToCanvas(client, new LocalPoint(localPoint.getX() - 64, localPoint.getY() + 64, worldView), plane);
 
 				if (canvasPointB != null)
 				{
