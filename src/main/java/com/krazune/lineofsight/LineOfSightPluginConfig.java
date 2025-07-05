@@ -41,7 +41,7 @@ public interface LineOfSightPluginConfig extends Config
 		position = 0,
 		keyName = "overlayRange",
 		name = "Range",
-		description = "Range of the line of sight overlay."
+		description = "Maximum range of the line of sight overlay."
 	)
 	@Range(
 		min = 1,
@@ -53,10 +53,10 @@ public interface LineOfSightPluginConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 1,
-		keyName = "outlineOnly",
-		name = "Outline only",
-		description = "Only show the outer borders."
+			position = 1,
+			keyName = "outlineOnly",
+			name = "Outline only",
+			description = "Only show the outer borders."
 	)
 	default boolean outlineOnly()
 	{
@@ -64,7 +64,18 @@ public interface LineOfSightPluginConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 2,
+			position = 2,
+			keyName = "includePlayerTile",
+			name = "Include player tile",
+			description = "Include the current player's tile in the line of sight area. WARNING: You do not actually have line of sight in this tile."
+	)
+	default boolean includePlayerTile()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 3,
 		keyName = "borderColor",
 		name = "Border color",
 		description = "Color of the overlay's border."
@@ -76,7 +87,7 @@ public interface LineOfSightPluginConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 3,
+		position = 4,
 		keyName = "borderWidth",
 		name = "Border width",
 		description = "Width of the overlay's border."
@@ -90,7 +101,7 @@ public interface LineOfSightPluginConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 4,
+		position = 5,
 		keyName = "showFill",
 		name = "Tile fill",
 		description = "Add fill color to tiles. WARNING: This is a costly feature that might lower your game's performance."
@@ -101,7 +112,7 @@ public interface LineOfSightPluginConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 5,
+		position = 6,
 		keyName = "fillColor",
 		name = "Fill color",
 		description = "Color of the overlay's tiles."
