@@ -66,7 +66,7 @@ public class TilesOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		WorldPoint[][] sightPoints = getSightWorldPoints();
+		WorldPoint[][] sightPoints = getSightWorldPoints(config.includePlayerTile());
 
 		if (config.outlineOnly())
 		{
@@ -80,7 +80,7 @@ public class TilesOverlay extends Overlay
 		return null;
 	}
 
-	public WorldPoint[][] getSightWorldPoints()
+	public WorldPoint[][] getSightWorldPoints(boolean includePlayerTile)
 	{
 		int areaLength = config.overlayRange() * 2 + 1;
 		WorldPoint[][] worldPoints = new WorldPoint[areaLength][areaLength];
@@ -109,19 +109,12 @@ public class TilesOverlay extends Overlay
 		{
 			for (int y = initialY, j = 0; y <= maxY; ++y, ++j)
 			{
-				if (x == area.getX() && y == area.getY())
-				{
-					continue;
-				}
-
 				WorldPoint newSightWorldPoint = new WorldPoint(x, y, area.getPlane());
 
-				if (!area.hasLineOfSightTo(worldView, newSightWorldPoint))
+				if (area.hasLineOfSightTo(worldView, newSightWorldPoint) || (x == area.getX() && y == area.getY() && includePlayerTile))
 				{
-					continue;
+					worldPoints[i][j] = newSightWorldPoint;
 				}
-
-				worldPoints[i][j] = newSightWorldPoint;
 			}
 		}
 
