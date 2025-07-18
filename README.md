@@ -16,6 +16,9 @@ Current version: **2025.07.1**
 ### Tile color
 ![Tile color](resources/fill.png)
 
+### Pvp tiles
+![Pvp tiles](resources/pvp.png)
+
 ## Configurations
 ![Configurations](resources/configurations.png)
 
