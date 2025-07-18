@@ -2,7 +2,7 @@
 RuneLite plugin that shows the player's line of sight.
 
 ## Version
-Current version: **2025.07.1**
+Current version: **2025.07.2**
 
 *&lt;year&gt;.&lt;zero padded month&gt;.&lt;revision number&gt;*
 
