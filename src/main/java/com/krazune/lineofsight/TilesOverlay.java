@@ -34,9 +34,15 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.Stroke;
 import javax.inject.Inject;
+import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import net.runelite.api.Client;
 import net.runelite.api.CollisionDataFlag;
+import net.runelite.api.NPC;
 import net.runelite.api.Perspective;
 import net.runelite.api.Player;
 import net.runelite.api.Point;
@@ -68,13 +74,21 @@ public class TilesOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (config.includeAsymmetrical())
+		if (config.showPlayerLos())
 		{
-			// It's not efficient to render these separately from the regular LOS, but will do for now
-			renderAsymmetricalLineOfSight(graphics);
+			if (config.includeAsymmetrical())
+			{
+				// It's not efficient to render these separately from the regular LOS, but will do for now
+				renderAsymmetricalLineOfSight(graphics);
+			}
+
+			renderLineOfSight(graphics);
 		}
 
-		renderLineOfSight(graphics);
+		if (config.showNpcLos())
+		{
+			renderNpcLineOfSight(graphics);
+		}
 
 		return null;
 	}
@@ -87,48 +101,133 @@ public class TilesOverlay extends Overlay
 
 	private void renderAsymmetricalLineOfSight(Graphics2D graphics)
 	{
-		WorldPoint[][] asymmetricalSightPoints = getAsymmetricalSightWorldPoints();
+		HashSet<WorldPoint> asymmetricalSightPoints = new HashSet<>();
+		WorldPoint[][] points = getAsymmetricalSightWorldPoints();
+		for (WorldPoint[] row : points) {
+			for (WorldPoint point : row) {
+				if (point != null) {
+					asymmetricalSightPoints.add(point);
+				}
+			}
+		}
 
 		renderWorldPoints(
 			graphics,
 			asymmetricalSightPoints,
-			config.outlineOnly(),
+			config.playerOutlineOnly(),
 			config.showAsymmetricalFill(),
 			config.asymmetricalFillColor(),
 			config.asymmetricalBorderColor(),
-			config.asymmetricalBorderWidth()
+			config.asymmetricalBorderWidth(),
+			config.playerOverlayRange() * 2 + 1
 		);
 	}
 
 	private void renderLineOfSight(Graphics2D graphics)
 	{
-		WorldPoint[][] sightPoints = getSightWorldPoints(config.includePlayerTile());
+		HashSet<WorldPoint> sightPoints = new HashSet<>();
+		WorldPoint[][] points = getSightWorldPoints(config.includePlayerTile());
+		for (WorldPoint[] row : points) {
+			for (WorldPoint point : row) {
+				if (point != null) {
+					sightPoints.add(point);
+				}
+			}
+		}
 
 		renderWorldPoints(
 			graphics,
 			sightPoints,
-			config.outlineOnly(),
+			config.playerOutlineOnly(),
 			config.showFill(),
 			config.fillColor(),
 			config.borderColor(),
-			config.borderWidth()
+			config.borderWidth(),
+			config.playerOverlayRange() * 2 + 1
 		);
 	}
 
-	private void renderWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints, boolean outlineOnly, boolean showFill, Color fillColor, Color borderColor, int borderWidth)
+	private void renderNpcLineOfSight(Graphics2D graphics)
+	{
+		List<NPC> npcs = client.getNpcs();
+		String npcNameFilter = config.npcNameFilter();
+		List<String> npcNameFilters = Arrays.stream(npcNameFilter.split(",")).map(String::trim).collect(Collectors.toList());
+		HashSet<WorldPoint> mergedSightPoints = new HashSet<>();
+
+		for (NPC npc : npcs)
+		{
+			if (npc == null || npc.getName() == null)
+			{
+				continue;
+			}
+
+			if (!npcNameFilter.isEmpty() && !npcNameFilters.stream().anyMatch(name -> npc.getName().equalsIgnoreCase(name)))
+			{
+				continue;
+			}
+
+			mergedSightPoints.addAll(Arrays.stream(getNpcSightWorldPoints(npc)).flatMap(Arrays::stream).filter(java.util.Objects::nonNull).collect(Collectors.toSet()));
+		}
+
+		renderWorldPoints(
+			graphics,
+			mergedSightPoints,
+			config.npcOutlineOnly(),
+			config.showNpcFill(),
+			config.npcFillColor(),
+			config.npcBorderColor(),
+			config.npcBorderWidth(),
+			config.npcOverlayRange() * 2 + 1
+		);
+	}
+
+	private WorldPoint[][] getNpcSightWorldPoints(NPC npc)
+	{
+		int areaLength = config.npcOverlayRange() * 2 + 1;
+		WorldPoint[][] worldPoints = new WorldPoint[areaLength][areaLength];
+		WorldArea area = npc.getWorldArea();
+
+		if (area == null)
+		{
+			return worldPoints;
+		}
+
+		int initialX = area.getX() - config.npcOverlayRange();
+		int initialY = area.getY() - config.npcOverlayRange();
+		int maxX = area.getX() + config.npcOverlayRange();
+		int maxY = area.getY() + config.npcOverlayRange();
+		WorldView worldView = client.getTopLevelWorldView();
+
+		for (int x = initialX, i = 0; x <= maxX; ++x, ++i)
+		{
+			for (int y = initialY, j = 0; y <= maxY; ++y, ++j)
+			{
+				WorldPoint newSightWorldPoint = new WorldPoint(x, y, area.getPlane());
+
+				if (area.hasLineOfSightTo(worldView, newSightWorldPoint) || (x == area.getX() && y == area.getY() && config.includeNpcTile()))
+				{
+					worldPoints[i][j] = newSightWorldPoint;
+				}
+			}
+		}
+
+		return worldPoints;
+	}
+
+	private void renderWorldPoints(Graphics2D graphics, HashSet<WorldPoint> sightPoints, boolean outlineOnly, boolean showFill, Color fillColor, Color borderColor, int borderWidth, int areaLength)
 	{
 		if (outlineOnly)
 		{
-			renderOutlineWorldPoints(graphics, sightPoints, showFill, fillColor, borderColor, borderWidth);
+			renderOutlineWorldPoints(graphics, sightPoints, showFill, fillColor, borderColor, borderWidth, areaLength);
 			return;
 		}
 
-		renderWorldPointsFullGrid(graphics, sightPoints, showFill, fillColor, borderColor, borderWidth);
+		renderWorldPointsFullGrid(graphics, sightPoints, showFill, fillColor, borderColor, borderWidth, areaLength);
 	}
 
 	private WorldPoint[][] getSightWorldPoints(boolean includePlayerTile)
 	{
-		int areaLength = config.overlayRange() * 2 + 1;
+		int areaLength = config.playerOverlayRange() * 2 + 1;
 		WorldPoint[][] worldPoints = new WorldPoint[areaLength][areaLength];
 
 		Player player = client.getLocalPlayer();
@@ -145,10 +244,10 @@ public class TilesOverlay extends Overlay
 			return worldPoints;
 		}
 
-		int initialX = area.getX() - config.overlayRange();
-		int initialY = area.getY() - config.overlayRange();
-		int maxX = area.getX() + config.overlayRange();
-		int maxY = area.getY() + config.overlayRange();
+		int initialX = area.getX() - config.playerOverlayRange();
+		int initialY = area.getY() - config.playerOverlayRange();
+		int maxX = area.getX() + config.playerOverlayRange();
+		int maxY = area.getY() + config.playerOverlayRange();
 		WorldView worldView = client.getTopLevelWorldView();
 
 		for (int x = initialX, i = 0; x <= maxX; ++x, ++i)
@@ -169,7 +268,7 @@ public class TilesOverlay extends Overlay
 
 	private WorldPoint[][] getAsymmetricalSightWorldPoints()
 	{
-		int areaLength = config.overlayRange() * 2 + 1;
+		int areaLength = config.playerOverlayRange() * 2 + 1;
 		WorldPoint[][] worldPoints = new WorldPoint[areaLength][areaLength];
 
 		Player player = client.getLocalPlayer();
@@ -186,10 +285,10 @@ public class TilesOverlay extends Overlay
 			return worldPoints;
 		}
 
-		int initialX = area.getX() - config.overlayRange();
-		int initialY = area.getY() - config.overlayRange();
-		int maxX = area.getX() + config.overlayRange();
-		int maxY = area.getY() + config.overlayRange();
+		int initialX = area.getX() - config.playerOverlayRange();
+		int initialY = area.getY() - config.playerOverlayRange();
+		int maxX = area.getX() + config.playerOverlayRange();
+		int maxY = area.getY() + config.playerOverlayRange();
 		WorldView worldView = client.getTopLevelWorldView();
 		int[][] collisionFlags = worldView.getCollisionMaps()[area.getPlane()].getFlags();
 
@@ -222,37 +321,27 @@ public class TilesOverlay extends Overlay
 		return worldPoints;
 	}
 
-	private void renderOutlineWorldPoints(Graphics2D graphics, WorldPoint[][] sightPoints, boolean showFill, Color fillColor, Color borderColor, int borderWidth)
+	private void renderOutlineWorldPoints(Graphics2D graphics, HashSet<WorldPoint> sightPoints, boolean showFill, Color fillColor, Color borderColor, int borderWidth, int areaLength)
 	{
-		int areaLength = config.overlayRange() * 2 + 1;
-
-		for (int x = 0; x < areaLength; ++x)
+		for (WorldPoint point : sightPoints)
 		{
-			for (int y = 0; y < areaLength; ++y)
+			if (showFill)
 			{
-				if (sightPoints[x][y] == null)
+				Polygon tilePolygon = generatePolygonFromWorldPoint(point);
+
+				if (tilePolygon != null)
 				{
-					continue;
+					graphics.setColor(fillColor);
+					graphics.fill(tilePolygon);
 				}
-
-				if (showFill)
-				{
-					Polygon tilePolygon = generatePolygonFromWorldPoint(sightPoints[x][y]);
-
-					if (tilePolygon != null)
-					{
-						graphics.setColor(fillColor);
-						graphics.fill(tilePolygon);
-					}
-				}
-
-				boolean topBorder = y == areaLength - 1 || sightPoints[x][y + 1] == null;
-				boolean rightBorder = x == areaLength - 1 || sightPoints[x + 1][y] == null;
-				boolean bottomBorder = y == 0 || sightPoints[x][y - 1] == null;
-				boolean leftBorder = x == 0 || sightPoints[x - 1][y] == null;
-
-				renderWorldPointBorders(graphics, sightPoints[x][y], topBorder, rightBorder, bottomBorder, leftBorder, borderColor, borderWidth);
 			}
+
+			boolean topBorder = !sightPoints.contains(new WorldPoint(point.getX(), point.getY() + 1, point.getPlane()));
+			boolean rightBorder = !sightPoints.contains(new WorldPoint(point.getX() + 1, point.getY(), point.getPlane()));
+			boolean bottomBorder = !sightPoints.contains(new WorldPoint(point.getX(), point.getY() - 1, point.getPlane()));
+			boolean leftBorder = !sightPoints.contains(new WorldPoint(point.getX() - 1, point.getY(), point.getPlane()));
+
+			renderWorldPointBorders(graphics, point, topBorder, rightBorder, bottomBorder, leftBorder, borderColor, borderWidth);
 		}
 	}
 
@@ -368,43 +457,27 @@ public class TilesOverlay extends Overlay
 		}
 	}
 
-	private void renderWorldPointsFullGrid(Graphics2D graphics, WorldPoint[][] sightPoints, boolean showFill, Color fillColor, Color borderColor, int borderWidth)
+	private void renderWorldPointsFullGrid(Graphics2D graphics, HashSet<WorldPoint> sightPoints, boolean showFill, Color fillColor, Color borderColor, int borderWidth, int areaLength)
 	{
-		int areaLength = config.overlayRange() * 2 + 1;
 		Color transparent = new Color(0, 0, 0, 0);
 		Stroke stroke = new BasicStroke(borderWidth);
 
-		for (int x = 0; x < areaLength; ++x)
+		for (WorldPoint point : sightPoints)
 		{
-			for (int y = 0; y < areaLength; ++y)
+			Polygon polygon = generatePolygonFromWorldPoint(point);
+
+			if (polygon == null)
 			{
-				if (sightPoints[x][y] == null)
-				{
-					continue;
-				}
+				continue;
+			}
 
-				Polygon polygon = generatePolygonFromWorldPoint(sightPoints[x][y]);
-
-				if (polygon == null)
-				{
-					continue;
-				}
-
-				if (showFill)
-				{
-					OverlayUtil.renderPolygon(graphics, polygon, borderColor, fillColor, stroke);
-
-					continue;
-				}
-
-				if (x == 0 || x == areaLength - 1 || y == 0 || y == areaLength - 1 || sightPoints[x + 1][y] == null || sightPoints[x - 1][y] == null || sightPoints[x][y + 1] == null || sightPoints[x][y - 1] == null)
-				{
-					OverlayUtil.renderPolygon(graphics, polygon, borderColor, transparent, stroke);
-
-					continue;
-				}
-
-				sightPoints[x][y] = null;
+			if (showFill)
+			{
+				OverlayUtil.renderPolygon(graphics, polygon, borderColor, fillColor, stroke);
+			}
+			else
+			{
+				OverlayUtil.renderPolygon(graphics, polygon, borderColor, transparent, stroke);
 			}
 		}
 	}

@@ -40,11 +40,11 @@ import java.awt.Color;
 public interface LineOfSightPluginConfig extends Config
 {
 	@ConfigSection(
-		name = "General",
-		description = "General configurations",
+		name = "Player",
+		description = "Player configurations",
 		position = 0
 	)
-	String generalSection = "General";
+	String playerSection = "Player";
 
 	@ConfigSection(
 		name = "Asymmetrical/PVP",
@@ -54,40 +54,60 @@ public interface LineOfSightPluginConfig extends Config
 	)
 	String asymmetricalSection = "Asymmetrical/PVP";
 
+	@ConfigSection(
+		name = "NPC",
+		description = "NPC configurations",
+		position = 2,
+		closedByDefault = true
+	)
+	String npcSection = "NPC";
+
 	@ConfigItem(
 		position = 0,
-		keyName = "overlayRange",
-		name = "Range",
-		description = "Maximum range of the line of sight overlay.",
-		section = generalSection
+		keyName = "playerOverlayRange",
+		name = "Player Range",
+		description = "Maximum range of the line of sight overlay for the player.",
+		section = playerSection
 	)
 	@Range(
 		min = 1,
 		max = 10
 	)
-	default int overlayRange()
+	default int playerOverlayRange()
 	{
 		return 10;
 	}
 
 	@ConfigItem(
 		position = 1,
-		keyName = "outlineOnly",
-		name = "Outline only",
-		description = "Only show the outer borders.",
-		section = generalSection
+		keyName = "showPlayerLos",
+		name = "Show Player LOS",
+		description = "Show line of sight for your player.",
+		section = playerSection
 	)
-	default boolean outlineOnly()
+	default boolean showPlayerLos()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		position = 2,
+		keyName = "playerOutlineOnly",
+		name = "Player Outline only",
+		description = "Only show the outer borders for the player.",
+		section = playerSection
+	)
+	default boolean playerOutlineOnly()
 	{
 		return false;
 	}
 
 	@ConfigItem(
-		position = 2,
+		position = 3,
 		keyName = "includePlayerTile",
 		name = "Include player tile",
 		description = "Include the current player's tile in the line of sight area. WARNING: You do not actually have line of sight in this tile.",
-		section = generalSection
+		section = playerSection
 	)
 	default boolean includePlayerTile()
 	{
@@ -95,11 +115,11 @@ public interface LineOfSightPluginConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 3,
+		position = 4,
 		keyName = "borderColor",
 		name = "Border color",
 		description = "Color of the overlay's border.",
-		section = generalSection
+		section = playerSection
 	)
 	@Alpha
 	default Color borderColor()
@@ -108,11 +128,11 @@ public interface LineOfSightPluginConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 4,
+		position = 5,
 		keyName = "borderWidth",
 		name = "Border width",
 		description = "Width of the overlay's border.",
-		section = generalSection
+		section = playerSection
 	)
 	@Range(
 		min = 1
@@ -125,11 +145,11 @@ public interface LineOfSightPluginConfig extends Config
 	// This is unnecessary, can be toggled based on fill alpha
 	// Should be removed but might cause breaking changes (configurations) for current installations
 	@ConfigItem(
-		position = 5,
+		position = 6,
 		keyName = "showFill",
 		name = "Tile fill",
 		description = "Add fill color to tiles. WARNING: This is a costly feature that might lower your game's performance.",
-		section = generalSection
+		section = playerSection
 	)
 	default boolean showFill()
 	{
@@ -137,11 +157,11 @@ public interface LineOfSightPluginConfig extends Config
 	}
 
 	@ConfigItem(
-		position = 6,
+		position = 7,
 		keyName = "fillColor",
 		name = "Fill color",
 		description = "Color of the overlay's tiles.",
-		section = generalSection
+		section = playerSection
 	)
 	@Alpha
 	default Color fillColor()
@@ -212,5 +232,122 @@ public interface LineOfSightPluginConfig extends Config
 	default Color asymmetricalFillColor()
 	{
 		return new Color(255, 0, 0, 45);
+	}
+
+	@ConfigItem(
+		position = 0,
+		keyName = "showNpcLos",
+		name = "Show NPC LOS",
+		description = "Show line of sight for NPCs.",
+		section = npcSection
+	)
+	default boolean showNpcLos()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 1,
+		keyName = "npcNameFilter",
+		name = "NPC Name Filter",
+		description = "Only show LOS for NPCs with this name.",
+		section = npcSection
+	)
+	default String npcNameFilter()
+	{
+		return "";
+	}
+
+	@ConfigItem(
+		position = 2,
+		keyName = "npcOverlayRange",
+		name = "NPC Range",
+		description = "Maximum range of the line of sight overlay for NPCs.",
+		section = npcSection
+	)
+	@Range(
+		min = 1,
+		max = 10
+	)
+	default int npcOverlayRange()
+	{
+		return 10;
+	}
+
+	@ConfigItem(
+		position = 3,
+		keyName = "includeNpcTile",
+		name = "Include NPC tile",
+		description = "Include the current NPC's tile in the line of sight area. WARNING: The NPC does not actually have line of sight in this tile.",
+		section = npcSection
+	)
+	default boolean includeNpcTile()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 4,
+		keyName = "npcOutlineOnly",
+		name = "NPC Outline only",
+		description = "Only show the outer borders for NPCs.",
+		section = npcSection
+	)
+	default boolean npcOutlineOnly()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 5,
+		keyName = "npcBorderColor",
+		name = "NPC Border color",
+		description = "Color of the NPC overlay's border.",
+		section = npcSection
+	)
+	@Alpha
+	default Color npcBorderColor()
+	{
+		return Color.CYAN;
+	}
+
+	@ConfigItem(
+		position = 6,
+		keyName = "npcBorderWidth",
+		name = "NPC Border width",
+		description = "Width of the NPC overlay's border.",
+		section = npcSection
+	)
+	@Range(
+		min = 1
+	)
+	default int npcBorderWidth()
+	{
+		return 2;
+	}
+
+	@ConfigItem(
+		position = 7,
+		keyName = "showNpcFill",
+		name = "NPC Tile fill",
+		description = "Add fill color to NPC tiles. WARNING: This is a costly feature that might lower your game's performance.",
+		section = npcSection
+	)
+	default boolean showNpcFill()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		position = 8,
+		keyName = "npcFillColor",
+		name = "NPC Fill color",
+		description = "Color of the NPC overlay's tiles.",
+		section = npcSection
+	)
+	@Alpha
+	default Color npcFillColor()
+	{
+		return new Color(0, 255, 255, 45);
 	}
 }
